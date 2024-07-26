@@ -22,25 +22,25 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    def imageName = "${env.DOCKERHUB_REPO}:latest"
-                    docker.withRegistry('https://index.docker.io/v1/', env.DOCKERHUB_CREDENTIALS) {
-                        docker.image(imageName).push()
-                    }
-                }
-            }
-        }
+        // stage('Push Docker Image') {
+        //     steps {
+        //         script {
+        //             def imageName = "${env.DOCKERHUB_REPO}:latest"
+        //             docker.withRegistry('https://index.docker.io/v1/', env.DOCKERHUB_CREDENTIALS) {
+        //                 docker.image(imageName).push()
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Deploy Container') {
-            steps {
-                script {
-                    def imageName = "${env.DOCKERHUB_REPO}:latest"
-                    sh "docker run -d --name hello-world-container ${imageName}"
-                }
-            }
-        }
+        // stage('Deploy Container') {
+        //     steps {
+        //         script {
+        //             def imageName = "${env.DOCKERHUB_REPO}:latest"
+        //             sh "docker run -d --name hello-world-container ${imageName}"
+        //         }
+        //     }
+        // }
     }
 
     post {
