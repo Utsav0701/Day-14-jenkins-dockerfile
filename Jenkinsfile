@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockercred') // Adjust this to your credential ID
-        DOCKERHUB_REPO = 'utsavshah0305/day14-docker-jenkins' // Adjust this to your DockerHub repository
+        DOCKERHUB_CREDENTIALS = credentials('dockercred')
+        DOCKERHUB_REPO = 'utsavshah0305/day14-docker-jenkins'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Utsav0701/Day-14-jenkins-dockerfile.git' // Adjust this to your repository URL
+                git branch: 'main', url: 'https://github.com/Utsav0701/Day-14-jenkins-dockerfile.git'
             }
         }
 
@@ -35,7 +35,7 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
-                    sh 'docker run -d --name java-app -p 8085:8080 ' + env.DOCKERHUB_REPO + ':latest'
+                    sh 'docker run -d --name java-app -p 8080:8080 ' + env.DOCKERHUB_REPO + ':latest'
                 }
             }
         }
