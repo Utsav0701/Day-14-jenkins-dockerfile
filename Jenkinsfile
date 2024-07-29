@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploy Stage"
-                    sh 'javac Samole.java'
+                    sh 'javac Sample.java'
                     sh 'java Sample'
                 }
             }
