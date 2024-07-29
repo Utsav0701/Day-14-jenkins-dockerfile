@@ -2,56 +2,48 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockercred') // Using the stored credentials ID
-        DOCKERHUB_REPO = 'utsavshah0305/day14-docker-jenkins' // Your DockerHub repository name
+        DOCKERHUB_CREDENTIALS = credentials('dockercred') // Adjust this to your credential ID
+        DOCKERHUB_REPO = 'utsavshah0305/day14-docker-jenkins' // Adjust this to your DockerHub repository
     }
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/Utsav0701/Day-14-jenkins-dockerfile.git', branch: 'main'
+                git 'https://github.com/Utsav0701/Day-14-jenkins-dockerfile.git' // Adjust this to your repository URL
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    def imageName = "${env.DOCKERHUB_REPO}:latest"
-                    docker.build(imageName)
+                    def image = docker.build("java-app:${env.BUILD_ID}")
+                    env.DOCKER_IMAGE = image.id
                 }
             }
         }
 
-        // stage('Push Docker Image') {
-        //     steps {
-        //         script {
-        //             def imageName = "${env.DOCKERHUB_REPO}:latest"
-        //             docker.withRegistry('https://index.docker.io/v1/', env.DOCKERHUB_CREDENTIALS) {
-        //                 docker.image(imageName).push()
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        docker.image(env.DOCKER_IMAGE).push('latest')
+                    }
+                }
+            }
+        }
 
-        // stage('Deploy Container') {
-        //     steps {
-        //         script {
-        //             def imageName = "${env.DOCKERHUB_REPO}:latest"
-        //             sh "docker run -d --name hello-world-container ${imageName}"
-        //         }
-        //     }
-        // }
+        stage('Deploy Container') {
+            steps {
+                script {
+                    sh 'docker run -d --name java-app -p 8085:8080 ' + env.DOCKERHUB_REPO + ':latest'
+                }
+            }
+        }
     }
 
     post {
         always {
-            echo 'Pipeline finished.'
-        }
-        success {
-            echo 'Pipeline succeeded.'
-        }
-        failure {
-            echo 'Pipeline failed.'
+            cleanWs()
         }
     }
 }
