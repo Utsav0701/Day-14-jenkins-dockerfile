@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockercred')
+        DOCKERHUB_CREDENTIALS = 'dockercred'
         DOCKERHUB_REPO = 'utsavshah0305/day14-docker-jenkins'
     }
 
@@ -16,8 +16,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def image = docker.build("java-app:${env.BUILD_ID}")
-                    env.DOCKER_IMAGE = image.id
+                    // Build the Docker image
+                    docker.build(DOCKERHUB_REPO)
                 }
             }
         }
@@ -25,8 +25,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-                        docker.image(env.DOCKER_IMAGE).push('latest')
+                    docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
+                        docker.image(env.DOCKER_IMAGE).push()
                     }
                 }
             }
@@ -35,7 +35,9 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
-                    sh 'docker run -d --name java-app -p 8080:8080 ' + env.DOCKERHUB_REPO + ':latest'
+                    echo "Deploy Stage"
+                    sh 'javac Samole.java'
+                    sh 'java Sample'
                 }
             }
         }
@@ -43,7 +45,8 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            // cleanWs()
+            echo "finish"
         }
     }
 }
